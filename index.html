@@ -374,10 +374,14 @@
         let currentType = 'sh';
         let animationTimer = null;
         let isFinalState = false; 
+        let blinkInterval = null; // 新增：用于闪烁的定时器
 
         // --- 逻辑控制 ---
         function startApp(type) {
             currentType = type;
+            // 清理旧状态
+            if (blinkInterval) clearInterval(blinkInterval);
+
             document.getElementById('home-page').classList.add('hidden');
             const chartPage = document.getElementById('chart-page');
             chartPage.classList.remove('hidden');
@@ -393,7 +397,11 @@
         // 返回首页
         function goBack() {
             if(animationTimer) clearTimeout(animationTimer);
-            if(myChart) { myChart.clear(); }
+            if(blinkInterval) clearInterval(blinkInterval); // 清理闪烁
+            if(myChart) { 
+                myChart.dispatchAction({ type: 'downplay' }); // 取消所有高亮
+                myChart.clear(); 
+            }
             
             document.getElementById('chart-page').style.opacity = 0;
             document.getElementById('chart-page').classList.add('hidden');
@@ -412,6 +420,12 @@
 
             myChart.on('click', function (params) {
                 if (isFinalState && params.componentType === 'series') {
+                    // 点击后停止闪烁，避免干扰
+                    if (blinkInterval) {
+                        clearInterval(blinkInterval);
+                        blinkInterval = null;
+                        myChart.dispatchAction({ type: 'downplay' });
+                    }
                     showDetail(params.name);
                 }
             });
@@ -500,8 +514,8 @@
                         color: '#FF7043', 
                         fontSize: 18, 
                         fontWeight: 'bold',
-                        fontFamily: 'Noto Serif SC, serif', /* 使用思源宋体 */
-                        lineHeight: 28 /* 增加行距 */
+                        fontFamily: 'Noto Serif SC, serif',
+                        lineHeight: 28
                     },
                     subtextStyle: { 
                         color: '#8D6E63', 
@@ -610,10 +624,32 @@
             });
             
             const centerTitle = (currentType === 'sh' ? '上证指数' : '深证成指') + '\n历史均值';
-            const centerSub = '点击玫瑰图看详细数据';
+            // 修改点：清空了中间的提示文字
+            const centerSub = ''; 
             const chartData = prepareData(avgData);
             myChart.setOption(getOption(chartData, true, centerTitle, centerSub), true);
             document.getElementById('bell-area').classList.add('visible');
+
+            // --- 新增逻辑：让"马"年对应的区块闪烁 ---
+            if (blinkInterval) clearInterval(blinkInterval);
+            const horseIndex = zodiacOrder.indexOf('马'); // 找到马的索引
+            let isHighlighted = false;
+            
+            // 立即开始第一次闪烁循环
+            setTimeout(() => {
+                 blinkInterval = setInterval(() => {
+                    if (!myChart) return;
+                    
+                    // 切换高亮和取消高亮
+                    myChart.dispatchAction({
+                        type: isHighlighted ? 'downplay' : 'highlight',
+                        seriesIndex: 1, // 玫瑰图是第二个 series
+                        dataIndex: horseIndex
+                    });
+                    
+                    isHighlighted = !isHighlighted;
+                }, 800); // 每800毫秒切换一次，形成呼吸感
+            }, 1000); // 图表动画结束后开始
         }
 
         function showDetail(zodiacName) {
