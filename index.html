@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>十二生肖与沪深股市 - Jin10.com</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. 设计系统 --- */
+        :root {
+            --bg-color: #FFF7E8;
+            --up-color: #FF7043;   
+            --down-color: #26A69A; 
+            --text-primary: #3E2723;
+            --text-secondary: #8D6E63;
+            --center-circle-color: #fbe5d0;
+            --btn-red-gradient: linear-gradient(135deg, #FF8A65 0%, #FF5252 100%);
+            
+            /* 字体定义 */
+            --font-serif: "Noto Serif SC", "Source Han Serif CN", "Songti SC", "SimSun", serif;
+            --font-sans: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        /* 基础重置 */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            /* 全局黑体使用苹方 */
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            overflow: hidden;
+            background-color: #e0e0e0; 
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* 衬线体通用类 */
+        .serif-font { font-family: var(--font-serif); }
+
+        /* --- 2. 手机容器 --- */
+        #app-container {
+            width: 100%; height: 100%; max-width: 480px; max-height: 900px;
+            background-color: var(--bg-color); position: relative; overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+
+        @media (max-width: 480px) {
+            body, html { background-color: var(--bg-color); }
+            #app-container { max-width: 100%; max-height: 100%; box-shadow: none; border-radius: 0; }
+        }
+
+        /* --- 3. 页面布局 --- */
+        .page {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            display: flex; flex-direction: column; align-items: center;
+            transition: opacity 0.6s; background: var(--bg-color); z-index: 1;
+        }
+        .hidden { display: none !important; opacity: 0; }
+
+        /* 祥云装饰 (通用) */
+        .bg-cloud {
+            position: absolute;
+            pointer-events: none; /* 穿透点击 */
+            opacity: 0.15;
+            z-index: 0;
+        }
+        .cloud-1 { width: 180px; top: 0px; left: -40px; transform: rotate(180deg); }
+        .cloud-2 { width: 220px; bottom: 20px; right: -60px; }
+        .cloud-3 { width: 120px; top: 120px; right: -30px; opacity: 0.1; }
+        .cloud-4 { width: 150px; bottom: 180px; left: -50px; transform: rotate(90deg); opacity: 0.12; }
+        .cloud-5 { width: 100px; top: 40%; right: 20px; opacity: 0.08; }
+
+        /* --- 首页样式 --- */
+        #home-page { 
+            justify-content: space-between; padding: 40px 30px 60px 30px; 
+            position: relative;
+        }
+        
+        /* 首页内容层 */
+        .home-content-layer {
+            position: relative; z-index: 2; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            flex: 1; justify-content: space-between;
+        }
+
+        .top-logo-container { margin-top: 10px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        /* Logo 缩小至 80% */
+        .top-logo { height: 80%; max-width: 160px; object-fit: contain; }
+
+        .title-area { text-align: center; margin-top: 20px; }
+        .main-title { font-size: 34px; font-weight: 800; margin-bottom: 10px; color: #1A2526; }
+        .sub-title { font-size: 15px; color: var(--text-secondary); border-top: 3px solid #D4AF37; display: inline-block; padding-top: 10px; }
+
+        .medallion-container {
+            width: 300px; height: 300px; margin: 20px 0;
+            animation: spin 60s linear infinite;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .medallion-img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+
+        .btn-group { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .home-btn {
+            width: 100%; padding: 18px; border: none; border-radius: 12px;
+            font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: transform 0.2s;
+            font-family: var(--font-sans); /* 按钮用黑体更清晰 */
+        }
+        .btn-sh { background: var(--btn-red-gradient); color: white; box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
+        .btn-sz { background: white; color: #FF7043; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .home-btn:active { transform: scale(0.98); }
+
+        .footer-text { margin-top: 20px; font-size: 12px; color: #aaa; font-weight: bold; letter-spacing: 1px; }
+
+        /* --- 图表页 --- */
+        #chart-page { padding-top: 20px; }
+        
+        .chart-header-group {
+            width: 100%; display: flex; flex-direction: column; align-items: center;
+            margin-bottom: 10px; min-height: 60px; position: relative;
+            padding: 0 10px; z-index: 2; /* 确保在祥云上 */
+        }
+        
+        .nav-title { 
+            font-size: 20px; font-weight: bold; color: var(--up-color); 
+            line-height: 1.4; margin-bottom: 5px; margin-top: 25px;
+            text-align: center; width: 80%;
+        }
+        .nav-subtitle {
+            font-size: 10px; color: #8D6E63; line-height: 1.4;
+            opacity: 0; transition: opacity 0.5s;
+            text-align: center;
+        }
+        .nav-subtitle.visible { opacity: 1; }
+
+        .back-tag {
+            position: absolute; top: 0; left: 10px;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; 
+            font-size: 24px; color: var(--text-secondary);
+            font-weight: bold; font-family: var(--font-sans);
+            transition: background 0.2s;
+        }
+        .back-tag:active { background: rgba(0,0,0,0.05); }
+
+        .skip-text { 
+            position: absolute; right: 15px; top: 30px;
+            font-size: 14px; color: var(--text-secondary); 
+            text-decoration: underline; cursor: pointer; 
+        }
+
+        .chart-container { width: 100%; height: 62%; position: relative; z-index: 2;}
+
+        .interaction-area { 
+            flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.8s ease;
+            z-index: 2;
+        }
+        .interaction-area.visible { opacity: 1; pointer-events: auto; }
+
+        .bell-btn {
+            background: var(--btn-red-gradient); width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(255, 82, 82, 0.5); border: 3px solid rgba(255,255,255,0.3);
+            margin-bottom: 10px; cursor: pointer; animation: pulse-red 2s infinite;
+        }
+        .bell-btn svg { width: 36px; height: 36px; fill: #FFFFFF; }
+        .bell-text { font-size: 14px; color: var(--text-secondary); font-weight: bold; }
+
+        @keyframes pulse-red {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 82, 82, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+        }
+
+        /* --- 弹窗样式 --- */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        /* 撞钟动画 */
+        .bell-anim-container { position: relative; width: 220px; height: 280px; display: flex; justify-content: center; }
+        .big-bell {
+            width: 180px; height: 240px;
+            background: linear-gradient(90deg, #7F6A3D, #D4AF37 30%, #A68B2E 60%, #7F6A3D);
+            border-radius: 40% 40% 15% 15% / 60% 60% 25% 25%;
+            position: relative; box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset 0 -5px 15px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .big-bell::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 50px; height: 25px;
+            background: linear-gradient(to bottom, #7F6A3D, #A68B2E); border-radius: 15px 15px 5px 5px; z-index: -1;
+        }
+        .big-bell::after {
+            content: ''; position: absolute; top: 10%; left: 0; width: 100%; height: 75%;
+            background-image: repeating-radial-gradient(circle at center, #7F6A3D 2px, transparent 4px), repeating-linear-gradient(to bottom, transparent, transparent 40px, rgba(0,0,0,0.3) 41px, rgba(0,0,0,0.3) 44px, transparent 45px);
+            background-size: 20px 20px, 100% 100%; background-position: 10px 10px, 0 0; opacity: 0.7; mix-blend-mode: overlay;
+        }
+        .striker {
+            position: absolute; top: 55%; left: -130px; width: 120px; height: 44px;
+            background: linear-gradient(90deg, #4A3328, #6D4C41 50%, #4A3328);
+            border-radius: 12px 4px 4px 12px; transform-origin: right center;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center;
+        }
+        .striker::after {
+            content: ''; position: absolute; right: 10px; width: 15px; height: 110%;
+            background: repeating-linear-gradient(45deg, #8D6E63, #8D6E63 2px, #5D4037 3px, #5D4037 5px); border-radius: 2px; top: -5%;
+        }
+        .striker.strike { animation: hit 0.5s ease-in-out forwards; }
+        .big-bell.ringing { animation: ring 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes hit { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(20deg) translateX(25px); } }
+        @keyframes ring { 10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1deg); } 20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); } 40%, 60% { transform: translate3d(-5px, 0, 0) rotate(-2deg); } }
+
+        /* 壁纸弹窗 */
+        .wallpaper-card { width: 85%; background: var(--bg-color); padding: 20px; border-radius: 15px; text-align: center; position: relative; }
+        .wallpaper-img-box { margin: 15px 0; border-radius: 10px; overflow: hidden; background: #eee; min-height: 200px; max-height: 60vh; }
+        .wallpaper-img { width: 100%; height: auto; display: block; transition: opacity 0.3s; }
+        
+        .modal-btn-group { display: flex; gap: 15px; margin-top: 15px; width: 100%; }
+        .modal-btn { flex: 1; padding: 12px 0; font-size: 16px; justify-content: center; }
+
+        /* 详情弹窗 */
+        .detail-card { width: 90%; max-height: 70%; background: var(--bg-color); border-radius: 15px; padding: 20px; overflow: hidden; display: flex; flex-direction: column; }
+        .detail-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+        .detail-list { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;}
+        .detail-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
+        .val-up { color: var(--up-color); font-weight: bold; }
+        .val-down { color: var(--down-color); font-weight: bold; }
+        .close-detail { margin-top: 15px; width: 100%; padding: 12px; background: var(--text-primary); color: white; border: none; border-radius: 8px; font-size: 16px;}
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <div id="home-page" class="page">
+            
+            <img src="./images/cloud.png" class="bg-cloud cloud-1" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-2" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-3" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-4" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-5" alt="cloud">
+
+            <div class="home-content-layer">
+                <div class="top-logo-container">
+                    <img src="./images/logo.png" onerror="this.style.display='none';this.parentNode.innerHTML='MARKET INSIGHT'" class="top-logo" alt="Jin10">
+                </div>
+                
+                <div class="medallion-container">
+                    <img src="./images/home-ring.png" 
+                         onerror="this.src='https://via.placeholder.com/300x300/e0e0e0/aaa?text=Home+Ring'" 
+                         class="medallion-img" alt="Zodiac Ring">
+                </div>
+
+                <div class="title-area">
+                    <div class="main-title serif-font">十二生肖与沪深股市</div>
+                    <div class="sub-title serif-font">沪深股指对应生肖的年均涨跌幅盘点</div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="home-btn btn-sh" onclick="startApp('sh')">
+                        <span>📈 上证指数</span><span>&gt;</span>
+                    </button>
+                    <button class="home-btn btn-sz" onclick="startApp('sz')">
+                        <span>📊 深证成指</span><span>&gt;</span>
+                    </button>
+                </div>
+                
+                <div class="footer-text">Jin10.com</div>
+            </div>
+        </div>
+
+        <div id="chart-page" class="page hidden">
+            <img src="./images/cloud.png" class="bg-cloud cloud-1" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-2" alt="cloud">
+            <img src="./images/cloud.png" class="bg-cloud cloud-3" alt="cloud">
+
+            <div class="chart-header-group">
+                <div class="back-tag" onclick="goBack()">&lt;</div>
+                
+                <div id="cycle-title" class="nav-title serif-font">历史回溯...</div>
+                <div id="cycle-subtitle" class="nav-subtitle"></div>
+                <div id="skip-btn" class="skip-text" onclick="skipAnimation()">跳过动画</div>
+            </div>
+
+            <div class="chart-container">
+                <div id="main-chart" style="width:100%; height:100%;"></div>
+            </div>
+
+            <div id="bell-area" class="interaction-area">
+                <div class="bell-btn" onclick="showBellAnimation()">
+                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                </div>
+                <div class="bell-text">敲钟祈好运 抽限量壁纸</div>
+            </div>
+        </div>
+
+        <div id="bell-overlay" class="modal-overlay">
+            <div style="text-align:center;">
+                <div class="bell-anim-container">
+                    <div class="striker" id="striker"></div>
+                    <div class="big-bell" id="big-bell"></div>
+                </div>
+                <div style="color:#FFD54F; margin-top:40px; font-size:22px; font-weight:bold; letter-spacing: 2px;" class="serif-font">吉时已到 · 鸿运当头</div>
+            </div>
+        </div>
+
+        <div id="wallpaper-modal" class="modal-overlay">
+            <div class="wallpaper-card">
+                <div style="position:absolute; right:15px; top:10px; font-size:24px; cursor:pointer;" onclick="closeModal('wallpaper-modal')">×</div>
+                <h3 class="serif-font" style="color:var(--text-primary);">马年大吉</h3>
+                <div class="wallpaper-img-box">
+                    <img id="wallpaper-img" src="" class="wallpaper-img">
+                </div>
+                <div class="modal-btn-group">
+                    <button class="home-btn btn-sh modal-btn" onclick="alert('请长按图片保存')">保存壁纸</button>
+                    <button class="home-btn btn-sz modal-btn" onclick="drawAgain()">再抽一次</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="detail-modal" class="modal-overlay">
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h3 id="detail-title" style="margin:0; color:var(--up-color);">生肖详情</h3>
+                </div>
+                <div id="detail-content" class="detail-list"></div>
+                <button class="close-detail" onclick="closeModal('detail-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 配置与数据 ---
+        const wallpaperList = ['w1.jpg', 'w2.jpg', 'w3.jpg'];
+        const zodiacIcons = {
+            '马': './images/horse.png', '羊': './images/sheep.png', '猴': './images/monkey.png',
+            '鸡': './images/chicken.png', '狗': './images/dog.png', '猪': './images/pig.png',
+            '鼠': './images/rat.png', '牛': './images/ox.png', '虎': './images/tiger.png',
+            '兔': './images/rabbit.png', '龙': './images/dragon.png', '蛇': './images/snake.png'
+        };
+        const zodiacOrder = ['马', '羊', '猴', '鸡', '狗', '猪', '鼠', '牛', '虎', '兔', '龙', '蛇'];
+        const rawData = [
+            {year: 1990, zodiac: '马', sh: 32.86, sz: 0}, {year: 1991, zodiac: '羊', sh: 129.41, sz: -2.48},
+            {year: 1992, zodiac: '猴', sh: 166.57, sz: 139.71}, {year: 1993, zodiac: '鸡', sh: 6.84, sz: -3.65},
+            {year: 1994, zodiac: '狗', sh: -22.30, sz: -42.88}, {year: 1995, zodiac: '猪', sh: -14.29, sz: -22.90},
+            {year: 1996, zodiac: '鼠', sh: 65.14, sz: 225.74}, {year: 1997, zodiac: '牛', sh: 30.22, sz: 30.06},
+            {year: 1998, zodiac: '虎', sh: -3.97, sz: -29.52}, {year: 1999, zodiac: '兔', sh: 19.18, sz: 14.25},
+            {year: 2000, zodiac: '龙', sh: 51.73, sz: 41.05}, {year: 2001, zodiac: '蛇', sh: -20.62, sz: -30.03},
+            {year: 2002, zodiac: '马', sh: -17.52, sz: -17.03}, {year: 2003, zodiac: '羊', sh: 10.27, sz: 26.11},
+            {year: 2004, zodiac: '猴', sh: -15.40, sz: -11.85}, {year: 2005, zodiac: '鸡', sh: -8.33, sz: -6.65},
+            {year: 2006, zodiac: '狗', sh: 130.43, sz: 132.12}, {year: 2007, zodiac: '猪', sh: 96.66, sz: 166.29},
+            {year: 2008, zodiac: '鼠', sh: -65.39, sz: -63.36}, {year: 2009, zodiac: '牛', sh: 79.98, sz: 111.24},
+            {year: 2010, zodiac: '虎', sh: -14.31, sz: -9.06}, {year: 2011, zodiac: '兔', sh: -21.68, sz: -28.41},
+            {year: 2012, zodiac: '龙', sh: 3.17, sz: 2.22}, {year: 2013, zodiac: '蛇', sh: -6.75, sz: -10.91},
+            {year: 2014, zodiac: '马', sh: 52.87, sz: 35.62}, {year: 2015, zodiac: '羊', sh: 9.41, sz: 14.98},
+            {year: 2016, zodiac: '猴', sh: -12.31, sz: -19.64}, {year: 2017, zodiac: '鸡', sh: 6.56, sz: 8.48},
+            {year: 2018, zodiac: '狗', sh: -24.59, sz: -34.42}, {year: 2019, zodiac: '猪', sh: 22.30, sz: 44.08},
+            {year: 2020, zodiac: '鼠', sh: 13.87, sz: 38.73}, {year: 2021, zodiac: '牛', sh: 4.80, sz: 2.67},
+            {year: 2022, zodiac: '虎', sh: -15.13, sz: -25.85}, {year: 2023, zodiac: '兔', sh: -3.70, sz: -13.54},
+            {year: 2024, zodiac: '龙', sh: 12.67, sz: 9.34}, {year: 2025, zodiac: '蛇', sh: 18.41, sz: 29.87}
+        ];
+
+        let myChart = null;
+        let currentType = 'sh';
+        let animationTimer = null;
+        let isFinalState = false; 
+
+        // --- 逻辑控制 ---
+        function startApp(type) {
+            currentType = type;
+            document.getElementById('home-page').classList.add('hidden');
+            const chartPage = document.getElementById('chart-page');
+            chartPage.classList.remove('hidden');
+            chartPage.style.opacity = 1;
+            document.getElementById('bell-area').classList.remove('visible');
+
+            setTimeout(() => {
+                initChart();
+                playSequentialAnimation();
+            }, 300);
+        }
+
+        // 返回首页
+        function goBack() {
+            if(animationTimer) clearTimeout(animationTimer);
+            if(myChart) { myChart.clear(); }
+            
+            document.getElementById('chart-page').style.opacity = 0;
+            document.getElementById('chart-page').classList.add('hidden');
+            document.getElementById('home-page').classList.remove('hidden');
+            
+            document.getElementById('skip-btn').style.display = 'block';
+            document.getElementById('cycle-subtitle').classList.remove('visible');
+            document.getElementById('bell-area').classList.remove('visible');
+        }
+
+        function initChart() {
+            const chartDom = document.getElementById('main-chart');
+            if(myChart) myChart.dispose();
+            myChart = echarts.init(chartDom, null, { renderer: 'svg' });
+            window.addEventListener('resize', () => myChart.resize());
+
+            myChart.on('click', function (params) {
+                if (isFinalState && params.componentType === 'series') {
+                    showDetail(params.name);
+                }
+            });
+        }
+
+        function skipAnimation() {
+            if (animationTimer) clearTimeout(animationTimer);
+            startFinalTransition();
+        }
+
+        // --- 核心：逐年闪烁动画 ---
+        function playSequentialAnimation() {
+            isFinalState = false;
+            const cycles = [
+                { start: 1990, end: 2001 },
+                { start: 2002, end: 2013 },
+                { start: 2014, end: 2025 }
+            ];
+            
+            let currentCycleIdx = 0;
+            let currentYearIdx = 0;
+
+            function renderFrame() {
+                if (currentCycleIdx >= cycles.length) {
+                    startFinalTransition();
+                    return;
+                }
+
+                const cycle = cycles[currentCycleIdx];
+                const cycleText = `${cycle.start}-${cycle.end}`;
+                document.getElementById('cycle-title').innerText = cycleText + " 逐年回顾";
+                document.getElementById('cycle-subtitle').innerHTML = "";
+
+                const cycleData = rawData.filter(d => d.year >= cycle.start && d.year <= cycle.end);
+                const chartData = prepareSequentialData(cycleData, currentYearIdx);
+                myChart.setOption(getOption(chartData, false, cycleText, false, false, true), true);
+
+                currentYearIdx++;
+                if (currentYearIdx >= 12) {
+                    currentYearIdx = 0;
+                    currentCycleIdx++;
+                    animationTimer = setTimeout(renderFrame, 800);
+                } else {
+                    animationTimer = setTimeout(renderFrame, 400);
+                }
+            }
+            renderFrame();
+        }
+
+        function prepareSequentialData(cycleData, activeIndex) {
+            return zodiacOrder.map((z, i) => {
+                const targetYearItem = cycleData[activeIndex]; 
+                const isActive = (targetYearItem && targetYearItem.zodiac === z);
+                const item = cycleData.find(d => d.zodiac === z);
+                const val = item ? (item.val !== undefined ? item.val : (currentType==='sh'?item.sh:item.sz)) : 0;
+                return {
+                    name: z, value: Math.abs(val) + 5, rawVal: val,
+                    year: item ? item.year : '', isActive: isActive
+                };
+            });
+        }
+
+        function prepareData(dataset) {
+            return zodiacOrder.map(z => {
+                const item = dataset.find(d => d.zodiac === z);
+                const val = item ? (item.val !== undefined ? item.val : (currentType==='sh'?item.sh:item.sz)) : 0;
+                return {
+                    name: z, value: Math.abs(val) + 5, rawVal: val,
+                    year: item ? item.year : '', isActive: false
+                };
+            });
+        }
+
+        function getOption(data, isAverage, centerText, subText, isRetracting = false, isSequentialMode = false) {
+            const upColor = '#FF7043';
+            const downColor = '#26A69A';
+            const centerCircleColor = getComputedStyle(document.documentElement).getPropertyValue('--center-circle-color').trim();
+            const outerRadius = isRetracting ? '30%' : '70%';
+
+            return {
+                title: {
+                    text: isRetracting ? '' : centerText,
+                    subtext: isRetracting ? '' : subText,
+                    left: 'center', top: 'center',
+                    textStyle: { 
+                        color: '#FF7043', 
+                        fontSize: 18, 
+                        fontWeight: 'bold',
+                        fontFamily: 'Noto Serif SC, serif', /* 使用思源宋体 */
+                        lineHeight: 28 /* 增加行距 */
+                    },
+                    subtextStyle: { 
+                        color: '#8D6E63', 
+                        fontSize: 10, 
+                        lineHeight: 14 
+                    },
+                    itemGap: 5
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: ['30%', '45%'],
+                        center: ['50%', '50%'],
+                        label: {
+                            position: 'inner',
+                            formatter: '{icon|}\n{name|{b}}',
+                            rich: {
+                                icon: { width: 24, height: 24, align: 'center', backgroundColor: { image: zodiacIcons[data[0].name] } },
+                                name: { fontSize: 10, color: '#5D4037', align: 'center', lineHeight: 14, fontWeight: 'bold', padding: [2, 0, 0, 0] }
+                            }
+                        },
+                        labelLine: { show: false },
+                        itemStyle: { color: centerCircleColor, borderColor: '#D7CCC8', borderWidth: 1 },
+                        data: data.map(d => ({
+                            name: d.name, value: 1,
+                            label: { show: true, rich: { icon: { backgroundColor: { image: zodiacIcons[d.name] } }, name: { color: '#5D4037' } } },
+                            itemStyle: { opacity: (isSequentialMode && !d.isActive) ? 0.5 : 1 } 
+                        })),
+                        animation: false, silent: true
+                    },
+                    {
+                        name: '涨跌幅',
+                        type: 'pie',
+                        radius: ['47%', outerRadius],
+                        center: ['50%', '50%'],
+                        roseType: 'area',
+                        itemStyle: { borderRadius: 0, borderColor: '#FFF7E8', borderWidth: 3 },
+                        label: {
+                            show: !isRetracting,
+                            position: 'outside',
+                            color: '#3E2723',
+                            formatter: function(params) {
+                                if (isRetracting) return '';
+                                const val = params.data.rawVal;
+                                const year = params.data.year;
+                                if (isSequentialMode && !params.data.isActive) { return ''; }
+                                if (isAverage) { return `{val|${val !== undefined ? val.toFixed(1) : 0}%}`; }
+                                return `{year|${year}}\n{val|${val !== undefined ? val.toFixed(1) : 0}%}`;
+                            },
+                            rich: {
+                                year: { fontSize: 10, color: '#888', align: 'center' },
+                                val: { fontSize: 12, fontWeight: 'bold', align: 'center' }
+                            }
+                        },
+                        labelLine: { show: !isRetracting, length: 3, length2: 5 },
+                        data: data.map(d => {
+                            let color = d.rawVal >= 0 ? upColor : downColor;
+                            let opacity = 1;
+                            if (isSequentialMode) {
+                                if (!d.isActive) { color = '#ccc'; opacity = 0.3; }
+                            }
+                            return {
+                                value: isRetracting ? 0 : d.value, 
+                                name: d.name, rawVal: d.rawVal, year: d.year, isActive: d.isActive,
+                                itemStyle: { color: color, opacity: opacity }
+                            };
+                        }),
+                        animationDuration: isSequentialMode ? 300 : 1000,
+                        animationEasing: 'cubicOut'
+                    }
+                ]
+            };
+        }
+
+        function startFinalTransition() {
+            if (animationTimer) clearTimeout(animationTimer);
+            document.getElementById('skip-btn').style.display = 'none';
+            document.getElementById('cycle-title').innerText = "数据汇总中...";
+            document.getElementById('cycle-subtitle').innerHTML = "";
+            const emptyData = zodiacOrder.map(z => ({ name: z, value: 0 }));
+            myChart.setOption(getOption(emptyData, false, "", "", true), true);
+            setTimeout(showAverageChart, 1000);
+        }
+
+        function showAverageChart() {
+            isFinalState = true;
+            const headerText = currentType === 'sh' ? '上证指数对应生肖平均涨跌幅' : '深证成指对应生肖平均涨跌幅';
+            document.getElementById('cycle-title').innerText = headerText;
+            
+            let subTextHTML = '1990-2025年' + (currentType==='sh'?'上证指数':'深证成指') + '对应生肖的年均涨跌幅<br>*盘点以公历日期计，为算术平均数';
+            if (currentType === 'sz') {
+                subTextHTML += '<br>**生肖马对应的深证成指年份较其他少一年';
+            }
+            const subTitleEl = document.getElementById('cycle-subtitle');
+            subTitleEl.innerHTML = subTextHTML;
+            subTitleEl.classList.add('visible');
+
+            let avgData = zodiacOrder.map(z => {
+                const items = rawData.filter(d => d.zodiac === z);
+                let sum = 0, count = 0;
+                items.forEach(item => {
+                    const val = currentType === 'sh' ? item.sh : item.sz;
+                    if (val !== null && val !== undefined) { sum += val; count++; }
+                });
+                return { zodiac: z, val: count > 0 ? (sum / count) : 0, year: '点击详情' };
+            });
+            
+            const centerTitle = (currentType === 'sh' ? '上证指数' : '深证成指') + '\n历史均值';
+            const centerSub = '点击玫瑰图看详细数据';
+            const chartData = prepareData(avgData);
+            myChart.setOption(getOption(chartData, true, centerTitle, centerSub), true);
+            document.getElementById('bell-area').classList.add('visible');
+        }
+
+        function showDetail(zodiacName) {
+            if (!zodiacName) return;
+            const items = rawData.filter(d => d.zodiac === zodiacName);
+            const title = `${zodiacName}年 - 历史${currentType === 'sh' ? '上证' : '深证'}表现`;
+            document.getElementById('detail-title').innerText = title;
+
+            let html = '';
+            items.forEach(item => {
+                const val = currentType === 'sh' ? item.sh : item.sz;
+                const colorClass = val >= 0 ? 'val-up' : 'val-down';
+                html += `
+                    <div class="detail-item">
+                        <span>${item.year}年</span>
+                        <span class="${colorClass}">${val >=0 ? '+' : ''}${val.toFixed(2)}%</span>
+                    </div>
+                `;
+            });
+            document.getElementById('detail-content').innerHTML = html;
+            document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function pickRandomWallpaper() {
+            if(wallpaperList.length > 0) {
+                const randIndex = Math.floor(Math.random() * wallpaperList.length);
+                const wallSrc = './images/' + wallpaperList[randIndex];
+                const imgEl = document.getElementById('wallpaper-img');
+                imgEl.style.opacity = 0;
+                setTimeout(() => {
+                    imgEl.src = wallSrc;
+                    imgEl.style.opacity = 1;
+                }, 100);
+            }
+        }
+
+        function showBellAnimation() {
+            const overlay = document.getElementById('bell-overlay');
+            const striker = document.getElementById('striker');
+            const bigBell = document.getElementById('big-bell');
+            
+            pickRandomWallpaper();
+
+            overlay.classList.add('active');
+            setTimeout(() => {
+                striker.classList.add('strike');
+                setTimeout(() => bigBell.classList.add('ringing'), 250);
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                    striker.classList.remove('strike');
+                    bigBell.classList.remove('ringing');
+                    document.getElementById('wallpaper-modal').classList.add('active');
+                }, 1500);
+            }, 300);
+        }
+
+        function drawAgain() {
+            closeModal('wallpaper-modal');
+            showBellAnimation();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+    </script>
+</body>
+</html>
