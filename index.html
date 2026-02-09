@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* --- 1. 设计系统 --- */
         :root {
             --bg-color: #FFF7E8;
             --up-color: #FF7043;   
@@ -18,21 +19,29 @@
             --text-secondary: #8D6E63;
             --center-circle-color: #fbe5d0;
             --btn-red-gradient: linear-gradient(135deg, #FF8A65 0%, #FF5252 100%);
+            
+            /* 字体定义 */
             --font-serif: "Noto Serif SC", "Source Han Serif CN", "Songti SC", "SimSun", serif;
             --font-sans: "PingFang SC", "Microsoft YaHei", sans-serif;
         }
 
+        /* 基础重置 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: var(--font-sans); color: var(--text-primary);
-            overflow: hidden; background-color: #e0e0e0; 
+            /* 全局黑体使用苹方 */
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            overflow: hidden;
+            background-color: #e0e0e0; 
             display: flex; justify-content: center; align-items: center;
         }
 
+        /* 衬线体通用类 */
         .serif-font { font-family: var(--font-serif); }
 
+        /* --- 2. 手机容器 --- */
         #app-container {
             width: 100%; height: 100%; max-width: 480px; max-height: 900px;
             background-color: var(--bg-color); position: relative; overflow: hidden;
@@ -44,6 +53,7 @@
             #app-container { max-width: 100%; max-height: 100%; box-shadow: none; border-radius: 0; }
         }
 
+        /* --- 3. 页面布局 --- */
         .page {
             width: 100%; height: 100%; position: absolute; top: 0; left: 0;
             display: flex; flex-direction: column; align-items: center;
@@ -51,77 +61,105 @@
         }
         .hidden { display: none !important; opacity: 0; }
 
-        .bg-cloud { position: absolute; pointer-events: none; opacity: 0.15; z-index: 0; }
+        /* 祥云装饰 (通用) */
+        .bg-cloud {
+            position: absolute;
+            pointer-events: none; /* 穿透点击 */
+            opacity: 0.15;
+            z-index: 0;
+        }
         .cloud-1 { width: 180px; top: 0px; left: -40px; transform: rotate(180deg); }
         .cloud-2 { width: 220px; bottom: 20px; right: -60px; }
         .cloud-3 { width: 120px; top: 120px; right: -30px; opacity: 0.1; }
         .cloud-4 { width: 150px; bottom: 180px; left: -50px; transform: rotate(90deg); opacity: 0.12; }
         .cloud-5 { width: 100px; top: 40%; right: 20px; opacity: 0.08; }
 
-        #home-page { justify-content: space-between; padding: 40px 30px 60px 30px; position: relative; }
+        /* --- 首页样式 --- */
+        #home-page { 
+            justify-content: space-between; padding: 40px 30px 60px 30px; 
+            position: relative;
+        }
+        
+        /* 首页内容层 */
         .home-content-layer {
-            position: relative; z-index: 2; width: 100%; flex: 1;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            position: relative; z-index: 2; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            flex: 1; justify-content: space-between;
         }
 
-        .top-logo-container { margin-top: 10px; height: 40px; }
+        .top-logo-container { margin-top: 10px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        /* Logo 缩小至 80% */
         .top-logo { height: 80%; max-width: 160px; object-fit: contain; }
 
         .title-area { text-align: center; margin-top: 20px; }
         .main-title { font-size: 34px; font-weight: 800; margin-bottom: 10px; color: #1A2526; }
         .sub-title { font-size: 15px; color: var(--text-secondary); border-top: 3px solid #D4AF37; display: inline-block; padding-top: 10px; }
 
-        .medallion-container { width: 300px; height: 300px; margin: 20px 0; animation: spin 60s linear infinite; }
+        .medallion-container {
+            width: 300px; height: 300px; margin: 20px 0;
+            animation: spin 60s linear infinite;
+            display: flex; justify-content: center; align-items: center;
+        }
         .medallion-img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
         .btn-group { width: 100%; display: flex; flex-direction: column; gap: 15px; }
         .home-btn {
             width: 100%; padding: 18px; border: none; border-radius: 12px;
             font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: transform 0.2s; font-family: var(--font-sans);
+            cursor: pointer; transition: transform 0.2s;
+            font-family: var(--font-sans); /* 按钮用黑体更清晰 */
         }
         .btn-sh { background: var(--btn-red-gradient); color: white; box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
         .btn-sz { background: white; color: #FF7043; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
         .home-btn:active { transform: scale(0.98); }
+
         .footer-text { margin-top: 20px; font-size: 12px; color: #aaa; font-weight: bold; letter-spacing: 1px; }
 
+        /* --- 图表页 --- */
         #chart-page { padding-top: 20px; }
+        
         .chart-header-group {
             width: 100%; display: flex; flex-direction: column; align-items: center;
-            margin-bottom: 10px; min-height: 60px; position: relative; padding: 0 10px; z-index: 2;
+            margin-bottom: 10px; min-height: 60px; position: relative;
+            padding: 0 10px; z-index: 2; /* 确保在祥云上 */
         }
         
         .nav-title { 
             font-size: 20px; font-weight: bold; color: var(--up-color); 
-            line-height: 1.4; margin-bottom: 5px; margin-top: 25px; text-align: center; width: 80%;
+            line-height: 1.4; margin-bottom: 5px; margin-top: 25px;
+            text-align: center; width: 80%;
         }
         .nav-subtitle {
-            font-size: 10px; color: #8D6E63; line-height: 1.4; opacity: 0; transition: opacity 0.5s; text-align: center;
+            font-size: 10px; color: #8D6E63; line-height: 1.4;
+            opacity: 0; transition: opacity 0.5s;
+            text-align: center;
         }
         .nav-subtitle.visible { opacity: 1; }
 
         .back-tag {
-            position: absolute; top: 0; left: 10px; width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; 
-            font-size: 24px; color: var(--text-secondary); font-weight: bold; font-family: var(--font-sans);
+            position: absolute; top: 0; left: 10px;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; 
+            font-size: 24px; color: var(--text-secondary);
+            font-weight: bold; font-family: var(--font-sans);
             transition: background 0.2s;
         }
         .back-tag:active { background: rgba(0,0,0,0.05); }
 
-        .skip-btn { 
-            position: absolute; right: 15px; top: 10px;
-            background: rgba(255, 255, 255, 0.9); border: 1px solid var(--text-secondary);
-            color: var(--text-secondary); font-size: 12px; padding: 4px 8px; border-radius: 12px;
-            cursor: pointer; display: flex; align-items: center; gap: 2px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 999;
+        .skip-text { 
+            position: absolute; right: 15px; top: 30px;
+            font-size: 14px; color: var(--text-secondary); 
+            text-decoration: underline; cursor: pointer; 
         }
-        .skip-btn::after { content: '>>'; font-size: 10px; margin-left: 2px; }
 
         .chart-container { width: 100%; height: 62%; position: relative; z-index: 2;}
 
         .interaction-area { 
             flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.8s ease; z-index: 2;
+            opacity: 0; pointer-events: none; transition: opacity 0.8s ease;
+            z-index: 2;
         }
         .interaction-area.visible { opacity: 1; pointer-events: auto; }
 
@@ -140,6 +178,7 @@
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
         }
 
+        /* --- 弹窗样式 --- */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
@@ -147,6 +186,7 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
+        /* 撞钟动画 */
         .bell-anim-container { position: relative; width: 220px; height: 280px; display: flex; justify-content: center; }
         .big-bell {
             width: 180px; height: 240px;
@@ -178,12 +218,15 @@
         @keyframes hit { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(20deg) translateX(25px); } }
         @keyframes ring { 10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1deg); } 20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); } 40%, 60% { transform: translate3d(-5px, 0, 0) rotate(-2deg); } }
 
+        /* 壁纸弹窗 */
         .wallpaper-card { width: 85%; background: var(--bg-color); padding: 20px; border-radius: 15px; text-align: center; position: relative; }
         .wallpaper-img-box { margin: 15px 0; border-radius: 10px; overflow: hidden; background: #eee; min-height: 200px; max-height: 60vh; }
         .wallpaper-img { width: 100%; height: auto; display: block; transition: opacity 0.3s; }
+        
         .modal-btn-group { display: flex; gap: 15px; margin-top: 15px; width: 100%; }
         .modal-btn { flex: 1; padding: 12px 0; font-size: 16px; justify-content: center; }
 
+        /* 详情弹窗 */
         .detail-card { width: 90%; max-height: 70%; background: var(--bg-color); border-radius: 15px; padding: 20px; overflow: hidden; display: flex; flex-direction: column; }
         .detail-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
         .detail-list { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;}
@@ -246,7 +289,7 @@
                 
                 <div id="cycle-title" class="nav-title serif-font">历史回溯...</div>
                 <div id="cycle-subtitle" class="nav-subtitle"></div>
-                <div id="skip-btn" class="skip-btn" onclick="skipAnimation()">跳过动画</div>
+                <div id="skip-btn" class="skip-text" onclick="skipAnimation()">跳过动画</div>
             </div>
 
             <div class="chart-container">
@@ -297,6 +340,7 @@
     </div>
 
     <script>
+        // --- 1. 配置与数据 ---
         const wallpaperList = ['w1.jpg', 'w2.jpg', 'w3.jpg'];
         const zodiacIcons = {
             '马': './images/horse.png', '羊': './images/sheep.png', '猴': './images/monkey.png',
@@ -331,6 +375,7 @@
         let animationTimer = null;
         let isFinalState = false; 
 
+        // --- 逻辑控制 ---
         function startApp(type) {
             currentType = type;
             document.getElementById('home-page').classList.add('hidden');
@@ -338,7 +383,6 @@
             chartPage.classList.remove('hidden');
             chartPage.style.opacity = 1;
             document.getElementById('bell-area').classList.remove('visible');
-            document.getElementById('skip-btn').style.display = 'flex';
 
             setTimeout(() => {
                 initChart();
@@ -346,16 +390,18 @@
             }, 300);
         }
 
+        // 返回首页
         function goBack() {
             if(animationTimer) clearTimeout(animationTimer);
             if(myChart) { myChart.clear(); }
+            
             document.getElementById('chart-page').style.opacity = 0;
             document.getElementById('chart-page').classList.add('hidden');
             document.getElementById('home-page').classList.remove('hidden');
-            document.getElementById('skip-btn').style.display = 'flex';
+            
+            document.getElementById('skip-btn').style.display = 'block';
             document.getElementById('cycle-subtitle').classList.remove('visible');
             document.getElementById('bell-area').classList.remove('visible');
-            isFinalState = false;
         }
 
         function initChart() {
@@ -363,6 +409,7 @@
             if(myChart) myChart.dispose();
             myChart = echarts.init(chartDom, null, { renderer: 'svg' });
             window.addEventListener('resize', () => myChart.resize());
+
             myChart.on('click', function (params) {
                 if (isFinalState && params.componentType === 'series') {
                     showDetail(params.name);
@@ -375,9 +422,15 @@
             startFinalTransition();
         }
 
+        // --- 核心：逐年闪烁动画 ---
         function playSequentialAnimation() {
             isFinalState = false;
-            const cycles = [{ start: 1990, end: 2001 }, { start: 2002, end: 2013 }, { start: 2014, end: 2025 }];
+            const cycles = [
+                { start: 1990, end: 2001 },
+                { start: 2002, end: 2013 },
+                { start: 2014, end: 2025 }
+            ];
+            
             let currentCycleIdx = 0;
             let currentYearIdx = 0;
 
@@ -386,6 +439,7 @@
                     startFinalTransition();
                     return;
                 }
+
                 const cycle = cycles[currentCycleIdx];
                 const cycleText = `${cycle.start}-${cycle.end}`;
                 document.getElementById('cycle-title').innerText = cycleText + " 逐年回顾";
@@ -397,7 +451,8 @@
 
                 currentYearIdx++;
                 if (currentYearIdx >= 12) {
-                    currentYearIdx = 0; currentCycleIdx++;
+                    currentYearIdx = 0;
+                    currentCycleIdx++;
                     animationTimer = setTimeout(renderFrame, 800);
                 } else {
                     animationTimer = setTimeout(renderFrame, 400);
@@ -413,7 +468,8 @@
                 const item = cycleData.find(d => d.zodiac === z);
                 const val = item ? (item.val !== undefined ? item.val : (currentType==='sh'?item.sh:item.sz)) : 0;
                 return {
-                    name: z, value: Math.abs(val) + 5, rawVal: val, year: item ? item.year : '', isActive: isActive
+                    name: z, value: Math.abs(val) + 5, rawVal: val,
+                    year: item ? item.year : '', isActive: isActive
                 };
             });
         }
@@ -423,49 +479,37 @@
                 const item = dataset.find(d => d.zodiac === z);
                 const val = item ? (item.val !== undefined ? item.val : (currentType==='sh'?item.sh:item.sz)) : 0;
                 return {
-                    name: z, value: Math.abs(val) + 5, rawVal: val, year: item ? item.year : '', isActive: false
+                    name: z, value: Math.abs(val) + 5, rawVal: val,
+                    year: item ? item.year : '', isActive: false
                 };
             });
-        }
-
-        // --- 核心修复：构建 Rich 样式映射表 ---
-        // 这样每个生肖都有独立的样式，不会全部变成第一个
-        function makeRichMap() {
-            let rich = {
-                year: { fontSize: 10, color: '#888', align: 'center', padding: [2, 0, 0, 0] },
-                val_up: { fontSize: 11, fontWeight: '900', align: 'center', padding: [0, 0, 4, 0], color: '#FF7043' },
-                val_down: { fontSize: 11, fontWeight: '900', align: 'center', padding: [0, 0, 4, 0], color: '#26A69A' },
-                name: { fontSize: 10, color: '#5D4037', align: 'center', lineHeight: 14, fontWeight: 'bold', padding: [2, 0, 0, 0] }
-            };
-            zodiacOrder.forEach(z => {
-                rich['icon_' + z] = {
-                    width: 24, height: 24, align: 'center',
-                    backgroundColor: { image: zodiacIcons[z] }
-                };
-            });
-            return rich;
         }
 
         function getOption(data, isAverage, centerText, subText, isRetracting = false, isSequentialMode = false) {
-            const upColor = '#FF7043'; const downColor = '#26A69A';
+            const upColor = '#FF7043';
+            const downColor = '#26A69A';
             const centerCircleColor = getComputedStyle(document.documentElement).getPropertyValue('--center-circle-color').trim();
             const outerRadius = isRetracting ? '30%' : '70%';
-            const fontSerif = getComputedStyle(document.documentElement).getPropertyValue('--font-serif').trim();
-            const fontSans = getComputedStyle(document.documentElement).getPropertyValue('--font-sans').trim();
-            
-            // 获取动态构建的 rich 样式
-            const richMap = makeRichMap();
 
-            const option = {
+            return {
                 title: {
                     text: isRetracting ? '' : centerText,
-                    subtext: isRetracting ? '' : subText, // 核心修改：恢复 subtext 显示
+                    subtext: isRetracting ? '' : subText,
                     left: 'center', top: 'center',
-                    textStyle: { color: '#FF7043', fontSize: 18, fontWeight: 'bold', fontFamily: fontSerif, lineHeight: 28 },
-                    subtextStyle: { color: '#8D6E63', fontSize: 10, lineHeight: 14 },
+                    textStyle: { 
+                        color: '#FF7043', 
+                        fontSize: 18, 
+                        fontWeight: 'bold',
+                        fontFamily: 'Noto Serif SC, serif', /* 使用思源宋体 */
+                        lineHeight: 28 /* 增加行距 */
+                    },
+                    subtextStyle: { 
+                        color: '#8D6E63', 
+                        fontSize: 10, 
+                        lineHeight: 14 
+                    },
                     itemGap: 5
                 },
-                // 移除 graphic，改用 title.subtext 显示
                 series: [
                     {
                         type: 'pie',
@@ -473,26 +517,18 @@
                         center: ['50%', '50%'],
                         label: {
                             position: 'inner',
-                            formatter: function(params) {
-                                // 核心修改：动态使用 icon_马, icon_羊 等标签
-                                let iconTag = '{icon_' + params.name + '|}';
-                                
-                                if (isSequentialMode && params.data.isActive) {
-                                    const val = params.data.rawVal.toFixed(1);
-                                    // 动态选择红绿样式
-                                    const valTag = params.data.rawVal >= 0 ? 'val_up' : 'val_down';
-                                    return iconTag + '\n{year|' + params.data.year + '}\n{' + valTag + '|' + val + '%}';
-                                }
-                                return iconTag + '\n{name|' + params.name + '}';
-                            },
-                            rich: richMap // 使用生成的 rich map
+                            formatter: '{icon|}\n{name|{b}}',
+                            rich: {
+                                icon: { width: 24, height: 24, align: 'center', backgroundColor: { image: zodiacIcons[data[0].name] } },
+                                name: { fontSize: 10, color: '#5D4037', align: 'center', lineHeight: 14, fontWeight: 'bold', padding: [2, 0, 0, 0] }
+                            }
                         },
                         labelLine: { show: false },
                         itemStyle: { color: centerCircleColor, borderColor: '#D7CCC8', borderWidth: 1 },
                         data: data.map(d => ({
                             name: d.name, value: 1,
-                            itemStyle: { opacity: (isSequentialMode && !d.isActive) ? 0.3 : 1 },
-                            rawVal: d.rawVal, year: d.year, isActive: d.isActive 
+                            label: { show: true, rich: { icon: { backgroundColor: { image: zodiacIcons[d.name] } }, name: { color: '#5D4037' } } },
+                            itemStyle: { opacity: (isSequentialMode && !d.isActive) ? 0.5 : 1 } 
                         })),
                         animation: false, silent: true
                     },
@@ -504,25 +540,28 @@
                         roseType: 'area',
                         itemStyle: { borderRadius: 0, borderColor: '#FFF7E8', borderWidth: 3 },
                         label: {
-                            // 动画模式下完全隐藏外层标签
-                            show: !isRetracting && !isSequentialMode,
-                            position: 'outside', color: '#3E2723',
+                            show: !isRetracting,
+                            position: 'outside',
+                            color: '#3E2723',
                             formatter: function(params) {
-                                if (isRetracting || isSequentialMode) return '';
+                                if (isRetracting) return '';
                                 const val = params.data.rawVal;
+                                const year = params.data.year;
+                                if (isSequentialMode && !params.data.isActive) { return ''; }
                                 if (isAverage) { return `{val|${val !== undefined ? val.toFixed(1) : 0}%}`; }
-                                return ''; 
+                                return `{year|${year}}\n{val|${val !== undefined ? val.toFixed(1) : 0}%}`;
                             },
                             rich: {
+                                year: { fontSize: 10, color: '#888', align: 'center' },
                                 val: { fontSize: 12, fontWeight: 'bold', align: 'center' }
                             }
                         },
-                        labelLine: { show: !isRetracting && !isSequentialMode, length: 3, length2: 5 },
+                        labelLine: { show: !isRetracting, length: 3, length2: 5 },
                         data: data.map(d => {
                             let color = d.rawVal >= 0 ? upColor : downColor;
                             let opacity = 1;
                             if (isSequentialMode) {
-                                if (!d.isActive) { color = '#ccc'; opacity = 0.2; }
+                                if (!d.isActive) { color = '#ccc'; opacity = 0.3; }
                             }
                             return {
                                 value: isRetracting ? 0 : d.value, 
@@ -535,7 +574,6 @@
                     }
                 ]
             };
-            return option;
         }
 
         function startFinalTransition() {
@@ -572,9 +610,9 @@
             });
             
             const centerTitle = (currentType === 'sh' ? '上证指数' : '深证成指') + '\n历史均值';
-            // 核心修改：将提示文字作为 subtext 传入
+            const centerSub = '点击玫瑰图看详细数据';
             const chartData = prepareData(avgData);
-            myChart.setOption(getOption(chartData, true, centerTitle, "点击玫瑰图看详细数据"), true);
+            myChart.setOption(getOption(chartData, true, centerTitle, centerSub), true);
             document.getElementById('bell-area').classList.add('visible');
         }
 
@@ -616,7 +654,9 @@
             const overlay = document.getElementById('bell-overlay');
             const striker = document.getElementById('striker');
             const bigBell = document.getElementById('big-bell');
+            
             pickRandomWallpaper();
+
             overlay.classList.add('active');
             setTimeout(() => {
                 striker.classList.add('strike');
