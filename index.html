@@ -102,12 +102,16 @@
         }
         .medallion-img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 
-        .btn-group { width: 100%; display: flex; flex-direction: column; gap: 15px; }
+        .btn-group { 
+            width: 100%; display: flex; flex-direction: row; gap: 15px; 
+            justify-content: center;
+        }
         .home-btn {
-            width: 100%; padding: 18px; border: none; border-radius: 12px;
-            font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;
+            flex: 1; padding: 18px 0; border: none; border-radius: 12px;
+            font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center;
             cursor: pointer; transition: transform 0.2s;
-            font-family: var(--font-sans); /* 按钮用黑体更清晰 */
+            font-family: var(--font-sans);
+            text-align: center;
         }
         .btn-sh { background: var(--btn-red-gradient); color: white; box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
         .btn-sz { background: white; color: #FF7043; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
@@ -127,7 +131,7 @@
         .nav-title { 
             font-size: 20px; font-weight: bold; color: var(--up-color); 
             line-height: 1.4; margin-bottom: 5px; margin-top: 25px;
-            text-align: center; width: 80%;
+            text-align: center; width: 70%;
         }
         .nav-subtitle {
             font-size: 10px; color: #8D6E63; line-height: 1.4;
@@ -136,17 +140,25 @@
         }
         .nav-subtitle.visible { opacity: 1; }
 
-        .back-tag {
-            position: absolute; top: 0; left: 10px;
-            width: 40px; height: 40px;
-            border-radius: 50%;
+        .switch-btn {
+            position: absolute; top: 15px; left: 15px;
+            padding: 5px 10px;
+            border: 2px solid #FF7043;
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; 
-            font-size: 24px; color: var(--text-secondary);
-            font-weight: bold; font-family: var(--font-sans);
-            transition: background 0.2s;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.2s;
+            color: #FF7043;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.2;
+            text-align: left;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .back-tag:active { background: rgba(0,0,0,0.05); }
+        .switch-btn:active { transform: scale(0.95); background: #fff; }
+        .switch-small { font-size: 11px; color: #8D6E63; font-weight: normal; display: block; margin-bottom: 2px;}
+        .switch-arrow { margin-right: 4px; font-size: 16px; color: #FF7043;}
 
         .skip-text { 
             position: absolute; right: 15px; top: 30px;
@@ -186,36 +198,79 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
-        /* 撞钟动画 */
+        /* 撞钟动画容器 */
         .bell-anim-container { position: relative; width: 220px; height: 280px; display: flex; justify-content: center; }
-        .big-bell {
-            width: 180px; height: 240px;
-            background: linear-gradient(90deg, #7F6A3D, #D4AF37 30%, #A68B2E 60%, #7F6A3D);
-            border-radius: 40% 40% 15% 15% / 60% 60% 25% 25%;
-            position: relative; box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset 0 -5px 15px rgba(0,0,0,0.5); overflow: hidden;
+        
+        /* 钟结构 */
+        .big-bell-container {
+            width: 160px; height: 190px;
+            position: relative;
+            background: transparent;
+            top: 20px;
         }
-        .big-bell::before {
-            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 50px; height: 25px;
-            background: linear-gradient(to bottom, #7F6A3D, #A68B2E); border-radius: 15px 15px 5px 5px; z-index: -1;
+        
+        /* 1. 顶部的环 */
+        .bell-handle {
+            position: absolute; left: 50%; top: -10px;
+            width: 24px; height: 24px; transform: translateX(-50%);
+            border: 6px solid #B7892B; border-radius: 50%;
+            z-index: -1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        .big-bell::after {
-            content: ''; position: absolute; top: 10%; left: 0; width: 100%; height: 75%;
-            background-image: repeating-radial-gradient(circle at center, #7F6A3D 2px, transparent 4px), repeating-linear-gradient(to bottom, transparent, transparent 40px, rgba(0,0,0,0.3) 41px, rgba(0,0,0,0.3) 44px, transparent 45px);
-            background-size: 20px 20px, 100% 100%; background-position: 10px 10px, 0 0; opacity: 0.7; mix-blend-mode: overlay;
+
+        /* 2. 钟身主体 */
+        .bell-body {
+            position: absolute; left: 15px; top: 5px;
+            width: 130px; height: 130px;
+            background: linear-gradient(90deg, #D4AF37, #FDD835 40%, #FBC02D 60%, #B7892B);
+            border-radius: 65px 65px 0 0;
+            box-shadow: inset 0 5px 15px rgba(255,255,255,0.4), inset 0 -10px 10px rgba(0,0,0,0.1);
+            z-index: 1;
+            overflow: hidden;
         }
+        .bell-body::after {
+            content: ''; position: absolute; top: 35%; left: 10%; width: 80%; height: 6px;
+            border-top: 2px solid rgba(139, 69, 19, 0.15);
+            border-bottom: 2px solid rgba(139, 69, 19, 0.15);
+        }
+
+        /* 3. 钟口 */
+        .bell-rim {
+            position: absolute; bottom: 25px; left: 0;
+            width: 160px; height: 40px;
+            background: linear-gradient(90deg, #D4AF37, #FDD835 40%, #FBC02D 60%, #B7892B);
+            border-radius: 10px 10px 25px 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.3);
+            z-index: 2;
+        }
+
+        /* 4. 钟摆 */
+        .bell-clapper {
+            position: absolute; bottom: 12px; left: 50%;
+            width: 26px; height: 26px; transform: translateX(-50%);
+            background: radial-gradient(circle at 30% 30%, #8D6E63, #3E2723);
+            border-radius: 50%;
+            z-index: 0;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* 撞击棒 */
         .striker {
-            position: absolute; top: 55%; left: -130px; width: 120px; height: 44px;
+            position: absolute; top: 50%; left: -120px; width: 120px; height: 44px;
             background: linear-gradient(90deg, #4A3328, #6D4C41 50%, #4A3328);
             border-radius: 12px 4px 4px 12px; transform-origin: right center;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center;
+            z-index: 5;
         }
         .striker::after {
             content: ''; position: absolute; right: 10px; width: 15px; height: 110%;
             background: repeating-linear-gradient(45deg, #8D6E63, #8D6E63 2px, #5D4037 3px, #5D4037 5px); border-radius: 2px; top: -5%;
         }
+
         .striker.strike { animation: hit 0.5s ease-in-out forwards; }
-        .big-bell.ringing { animation: ring 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes hit { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(20deg) translateX(25px); } }
+        .big-bell-container.ringing { animation: ring 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        @keyframes hit { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(20deg) translateX(20px); } }
         @keyframes ring { 10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1deg); } 20%, 80% { transform: translate3d(5px, 0, 0) rotate(2deg); } 40%, 60% { transform: translate3d(-5px, 0, 0) rotate(-2deg); } }
 
         /* 壁纸弹窗 */
@@ -233,6 +288,7 @@
         .detail-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
         .val-up { color: var(--up-color); font-weight: bold; }
         .val-down { color: var(--down-color); font-weight: bold; }
+        .val-neutral { color: var(--text-secondary); font-weight: bold; } 
         .close-detail { margin-top: 15px; width: 100%; padding: 12px; background: var(--text-primary); color: white; border: none; border-radius: 8px; font-size: 16px;}
         
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -268,10 +324,10 @@
 
                 <div class="btn-group">
                     <button class="home-btn btn-sh" onclick="startApp('sh')">
-                        <span>📈 上证指数</span><span>&gt;</span>
+                        上证指数
                     </button>
                     <button class="home-btn btn-sz" onclick="startApp('sz')">
-                        <span>📊 深证成指</span><span>&gt;</span>
+                        深证成指
                     </button>
                 </div>
                 
@@ -285,7 +341,13 @@
             <img src="./images/cloud.png" class="bg-cloud cloud-3" alt="cloud">
 
             <div class="chart-header-group">
-                <div class="back-tag" onclick="goBack()">&lt;</div>
+                <div id="nav-switch-btn" class="switch-btn" onclick="toggleStockType()">
+                    <span class="switch-arrow">&lt;</span>
+                    <div>
+                        <span class="switch-small">查看</span>
+                        <span id="nav-target-name">深成指</span>
+                    </div>
+                </div>
                 
                 <div id="cycle-title" class="nav-title serif-font">历史回溯...</div>
                 <div id="cycle-subtitle" class="nav-subtitle"></div>
@@ -308,7 +370,12 @@
             <div style="text-align:center;">
                 <div class="bell-anim-container">
                     <div class="striker" id="striker"></div>
-                    <div class="big-bell" id="big-bell"></div>
+                    <div class="big-bell-container" id="big-bell">
+                        <div class="bell-handle"></div>
+                        <div class="bell-body"></div>
+                        <div class="bell-rim"></div>
+                        <div class="bell-clapper"></div>
+                    </div>
                 </div>
                 <div style="color:#FFD54F; margin-top:40px; font-size:22px; font-weight:bold; letter-spacing: 2px;" class="serif-font">吉时已到 · 鸿运当头</div>
             </div>
@@ -322,7 +389,7 @@
                     <img id="wallpaper-img" src="" class="wallpaper-img">
                 </div>
                 <div class="modal-btn-group">
-                    <button class="home-btn btn-sh modal-btn" onclick="alert('请长按图片保存')">保存壁纸</button>
+                    <button class="home-btn btn-sh modal-btn" onclick="saveCurrentWallpaper()">保存壁纸</button>
                     <button class="home-btn btn-sz modal-btn" onclick="drawAgain()">再抽一次</button>
                 </div>
             </div>
@@ -341,7 +408,10 @@
 
     <script>
         // --- 1. 配置与数据 ---
-        const wallpaperList = ['w1.jpg', 'w2.jpg', 'w3.jpg'];
+        // 修改点：更新了壁纸列表，包含 w4, w5, w6
+        // 请确保上传文件名为 w4.jpg, w5.jpg, w6.jpg
+        const wallpaperList = ['w1.jpg', 'w2.jpg', 'w3.jpg', 'w4.jpg', 'w5.jpg', 'w6.jpg'];
+        
         const zodiacIcons = {
             '马': './images/horse.png', '羊': './images/sheep.png', '猴': './images/monkey.png',
             '鸡': './images/chicken.png', '狗': './images/dog.png', '猪': './images/pig.png',
@@ -374,19 +444,21 @@
         let currentType = 'sh';
         let animationTimer = null;
         let isFinalState = false; 
-        let blinkInterval = null; // 新增：用于闪烁的定时器
+        let blinkInterval = null; 
 
         // --- 逻辑控制 ---
         function startApp(type) {
             currentType = type;
-            // 清理旧状态
             if (blinkInterval) clearInterval(blinkInterval);
+
+            updateNavButton();
 
             document.getElementById('home-page').classList.add('hidden');
             const chartPage = document.getElementById('chart-page');
             chartPage.classList.remove('hidden');
             chartPage.style.opacity = 1;
             document.getElementById('bell-area').classList.remove('visible');
+            document.getElementById('skip-btn').style.display = 'block';
 
             setTimeout(() => {
                 initChart();
@@ -394,22 +466,17 @@
             }, 300);
         }
 
-        // 返回首页
-        function goBack() {
-            if(animationTimer) clearTimeout(animationTimer);
-            if(blinkInterval) clearInterval(blinkInterval); // 清理闪烁
-            if(myChart) { 
-                myChart.dispatchAction({ type: 'downplay' }); // 取消所有高亮
-                myChart.clear(); 
+        function toggleStockType() {
+            startApp(currentType === 'sh' ? 'sz' : 'sh');
+        }
+
+        function updateNavButton() {
+            const nameSpan = document.getElementById('nav-target-name');
+            if (currentType === 'sh') {
+                nameSpan.innerText = "深成指";
+            } else {
+                nameSpan.innerText = "沪指";
             }
-            
-            document.getElementById('chart-page').style.opacity = 0;
-            document.getElementById('chart-page').classList.add('hidden');
-            document.getElementById('home-page').classList.remove('hidden');
-            
-            document.getElementById('skip-btn').style.display = 'block';
-            document.getElementById('cycle-subtitle').classList.remove('visible');
-            document.getElementById('bell-area').classList.remove('visible');
         }
 
         function initChart() {
@@ -420,7 +487,6 @@
 
             myChart.on('click', function (params) {
                 if (isFinalState && params.componentType === 'series') {
-                    // 点击后停止闪烁，避免干扰
                     if (blinkInterval) {
                         clearInterval(blinkInterval);
                         blinkInterval = null;
@@ -467,9 +533,9 @@
                 if (currentYearIdx >= 12) {
                     currentYearIdx = 0;
                     currentCycleIdx++;
-                    animationTimer = setTimeout(renderFrame, 800);
+                    animationTimer = setTimeout(renderFrame, 900);
                 } else {
-                    animationTimer = setTimeout(renderFrame, 400);
+                    animationTimer = setTimeout(renderFrame, 450);
                 }
             }
             renderFrame();
@@ -562,6 +628,11 @@
                                 const val = params.data.rawVal;
                                 const year = params.data.year;
                                 if (isSequentialMode && !params.data.isActive) { return ''; }
+                                
+                                if (year === 1990 && currentType === 'sz') {
+                                     return `{year|${year}}\n{val|-}`;
+                                }
+                                
                                 if (isAverage) { return `{val|${val !== undefined ? val.toFixed(1) : 0}%}`; }
                                 return `{year|${year}}\n{val|${val !== undefined ? val.toFixed(1) : 0}%}`;
                             },
@@ -573,6 +644,9 @@
                         labelLine: { show: !isRetracting, length: 3, length2: 5 },
                         data: data.map(d => {
                             let color = d.rawVal >= 0 ? upColor : downColor;
+                            if (d.year === 1990 && currentType === 'sz') {
+                                color = '#ccc';
+                            }
                             let opacity = 1;
                             if (isSequentialMode) {
                                 if (!d.isActive) { color = '#ccc'; opacity = 0.3; }
@@ -618,38 +692,34 @@
                 let sum = 0, count = 0;
                 items.forEach(item => {
                     const val = currentType === 'sh' ? item.sh : item.sz;
+                    if (item.year === 1990 && currentType === 'sz') return; 
+
                     if (val !== null && val !== undefined) { sum += val; count++; }
                 });
                 return { zodiac: z, val: count > 0 ? (sum / count) : 0, year: '点击详情' };
             });
             
             const centerTitle = (currentType === 'sh' ? '上证指数' : '深证成指') + '\n历史均值';
-            // 修改点：清空了中间的提示文字
             const centerSub = ''; 
             const chartData = prepareData(avgData);
             myChart.setOption(getOption(chartData, true, centerTitle, centerSub), true);
             document.getElementById('bell-area').classList.add('visible');
 
-            // --- 新增逻辑：让"马"年对应的区块闪烁 ---
             if (blinkInterval) clearInterval(blinkInterval);
-            const horseIndex = zodiacOrder.indexOf('马'); // 找到马的索引
+            const horseIndex = zodiacOrder.indexOf('马'); 
             let isHighlighted = false;
             
-            // 立即开始第一次闪烁循环
             setTimeout(() => {
                  blinkInterval = setInterval(() => {
                     if (!myChart) return;
-                    
-                    // 切换高亮和取消高亮
                     myChart.dispatchAction({
                         type: isHighlighted ? 'downplay' : 'highlight',
-                        seriesIndex: 1, // 玫瑰图是第二个 series
+                        seriesIndex: 1, 
                         dataIndex: horseIndex
                     });
-                    
                     isHighlighted = !isHighlighted;
-                }, 800); // 每800毫秒切换一次，形成呼吸感
-            }, 1000); // 图表动画结束后开始
+                }, 800); 
+            }, 1000); 
         }
 
         function showDetail(zodiacName) {
@@ -659,16 +729,36 @@
             document.getElementById('detail-title').innerText = title;
 
             let html = '';
+            
+            // 1. 正常循环历史年份
             items.forEach(item => {
                 const val = currentType === 'sh' ? item.sh : item.sz;
-                const colorClass = val >= 0 ? 'val-up' : 'val-down';
+                let displayVal, colorClass;
+                if (item.year === 1990 && currentType === 'sz') {
+                    displayVal = '-';
+                    colorClass = 'val-neutral';
+                } else {
+                    displayVal = (val >= 0 ? '+' : '') + val.toFixed(2) + '%';
+                    colorClass = val >= 0 ? 'val-up' : 'val-down';
+                }
+
                 html += `
                     <div class="detail-item">
                         <span>${item.year}年</span>
-                        <span class="${colorClass}">${val >=0 ? '+' : ''}${val.toFixed(2)}%</span>
+                        <span class="${colorClass}">${displayVal}</span>
                     </div>
                 `;
             });
+
+            if (zodiacName === '马') {
+                html += `
+                    <div class="detail-item" style="border-bottom:none;">
+                        <span>2026年</span>
+                        <span style="color:#999; font-weight:bold;">? %</span>
+                    </div>
+                `;
+            }
+
             document.getElementById('detail-content').innerHTML = html;
             document.getElementById('detail-modal').classList.add('active');
         }
@@ -689,7 +779,7 @@
         function showBellAnimation() {
             const overlay = document.getElementById('bell-overlay');
             const striker = document.getElementById('striker');
-            const bigBell = document.getElementById('big-bell');
+            const bigBell = document.getElementById('big-bell'); // 此时 big-bell 是 container
             
             pickRandomWallpaper();
 
@@ -704,6 +794,22 @@
                     document.getElementById('wallpaper-modal').classList.add('active');
                 }, 1500);
             }, 300);
+        }
+
+        // 修改点：直接下载壁纸的逻辑
+        function saveCurrentWallpaper() {
+            const imgEl = document.getElementById('wallpaper-img');
+            if (!imgEl || !imgEl.src) return;
+
+            const url = imgEl.src;
+            // 创建一个临时链接触发下载
+            const link = document.createElement('a');
+            link.href = url;
+            // 设置下载文件名
+            link.download = 'Jin10_Wallpaper.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function drawAgain() {
