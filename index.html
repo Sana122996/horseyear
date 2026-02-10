@@ -74,13 +74,54 @@
         .cloud-4 { width: 150px; bottom: 180px; left: -50px; transform: rotate(90deg); opacity: 0.12; }
         .cloud-5 { width: 100px; top: 40%; right: 20px; opacity: 0.08; }
 
+        /* --- 音乐控制按钮 --- */
+        .music-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            z-index: 1000; /* 保证最上层 */
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #FF7043;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .music-control svg {
+            width: 20px;
+            height: 20px;
+            fill: #FF7043;
+        }
+        .music-control.playing {
+            animation: music-rotate 3s linear infinite;
+            background: rgba(255, 247, 232, 0.9);
+            box-shadow: 0 0 10px rgba(255, 112, 67, 0.4);
+        }
+        .music-control.paused::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 24px;
+            background: #FF7043;
+            transform: rotate(45deg);
+        }
+
+        @keyframes music-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         /* --- 首页样式 --- */
         #home-page { 
             justify-content: space-between; padding: 40px 30px 60px 30px; 
             position: relative;
         }
         
-        /* 首页内容层 */
         .home-content-layer {
             position: relative; z-index: 2; width: 100%;
             display: flex; flex-direction: column; align-items: center;
@@ -88,7 +129,6 @@
         }
 
         .top-logo-container { margin-top: 10px; height: 40px; display: flex; align-items: center; justify-content: center; }
-        /* Logo 缩小至 80% */
         .top-logo { height: 80%; max-width: 160px; object-fit: contain; }
 
         .title-area { text-align: center; margin-top: 20px; }
@@ -113,25 +153,46 @@
             font-family: var(--font-sans);
             text-align: center;
         }
-        .btn-sh { background: var(--btn-red-gradient); color: white; box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
+        .btn-sh { 
+            background: var(--btn-red-gradient); 
+            color: white; 
+            box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4);
+            animation: btn-breathing 2s infinite ease-in-out;
+        }
         .btn-sz { background: white; color: #FF7043; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-        .home-btn:active { transform: scale(0.98); }
+        .home-btn:active { transform: scale(0.98); animation: none; }
+
+        @keyframes btn-breathing {
+            0% { transform: scale(1); box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 15px 35px rgba(255, 82, 82, 0.7); filter: brightness(1.1); }
+            100% { transform: scale(1); box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4); }
+        }
 
         .footer-text { margin-top: 20px; font-size: 12px; color: #aaa; font-weight: bold; letter-spacing: 1px; }
 
         /* --- 图表页 --- */
-        #chart-page { padding-top: 20px; }
+        #chart-page { padding-top: 15px; } 
         
         .chart-header-group {
             width: 100%; display: flex; flex-direction: column; align-items: center;
-            margin-bottom: 10px; min-height: 60px; position: relative;
-            padding: 0 10px; z-index: 2; /* 确保在祥云上 */
+            margin-bottom: 5px; position: relative;
+            z-index: 2; 
+        }
+
+        .header-controls {
+            width: 100%; 
+            display: flex; 
+            justify-content: flex-start; /* 改为靠左 */
+            align-items: center; 
+            padding: 0 15px;
+            margin-bottom: 5px;
+            height: 40px;
         }
         
         .nav-title { 
             font-size: 20px; font-weight: bold; color: var(--up-color); 
-            line-height: 1.4; margin-bottom: 5px; margin-top: 25px;
-            text-align: center; width: 70%;
+            line-height: 1.4; margin-bottom: 2px; margin-top: 5px;
+            text-align: center; width: 90%;
         }
         .nav-subtitle {
             font-size: 10px; color: #8D6E63; line-height: 1.4;
@@ -141,32 +202,47 @@
         .nav-subtitle.visible { opacity: 1; }
 
         .switch-btn {
-            position: absolute; top: 15px; left: 15px;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border: 2px solid #FF7043;
             border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             cursor: pointer; 
             background: rgba(255,255,255,0.8);
             transition: all 0.2s;
             color: #FF7043;
-            font-size: 14px;
+            font-size: 15px; 
             font-weight: bold;
-            line-height: 1.2;
-            text-align: left;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            gap: 6px; 
+            flex-direction: row; 
         }
         .switch-btn:active { transform: scale(0.95); background: #fff; }
-        .switch-small { font-size: 11px; color: #8D6E63; font-weight: normal; display: block; margin-bottom: 2px;}
-        .switch-arrow { margin-right: 4px; font-size: 16px; color: #FF7043;}
+        
+        .switch-btn div { display: flex; align-items: center; gap: 4px; }
+        .switch-small { font-size: 15px; color: #FF7043; font-weight: bold; margin: 0; }
+        .switch-arrow { margin-right: 0; font-size: 16px; color: #FF7043; line-height: 1;}
 
-        .skip-text { 
-            position: absolute; right: 15px; top: 30px;
-            font-size: 14px; color: var(--text-secondary); 
-            text-decoration: underline; cursor: pointer; 
+        /* 修改点：调整跳过按钮样式，使其居中显示 */
+        .skip-container {
+            width: 100%;
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            height: 30px;
+            z-index: 10;
         }
 
-        .chart-container { width: 100%; height: 62%; position: relative; z-index: 2;}
+        .skip-text { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+            text-decoration: underline; 
+            cursor: pointer; 
+            padding: 5px 10px; /* 增加点击区域 */
+        }
+
+        .chart-container { width: 100%; height: 60%; position: relative; z-index: 2;}
 
         .interaction-area { 
             flex: 1; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px; align-items: center;
@@ -198,7 +274,6 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
-        /* 撞钟动画容器 */
         .bell-anim-container { position: relative; width: 220px; height: 280px; display: flex; justify-content: center; }
         
         /* 钟结构 */
@@ -209,7 +284,6 @@
             top: 20px;
         }
         
-        /* 1. 顶部的环 */
         .bell-handle {
             position: absolute; left: 50%; top: -10px;
             width: 24px; height: 24px; transform: translateX(-50%);
@@ -218,7 +292,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
-        /* 2. 钟身主体 */
         .bell-body {
             position: absolute; left: 15px; top: 5px;
             width: 130px; height: 130px;
@@ -234,7 +307,6 @@
             border-bottom: 2px solid rgba(139, 69, 19, 0.15);
         }
 
-        /* 3. 钟口 */
         .bell-rim {
             position: absolute; bottom: 25px; left: 0;
             width: 160px; height: 40px;
@@ -244,7 +316,6 @@
             z-index: 2;
         }
 
-        /* 4. 钟摆 */
         .bell-clapper {
             position: absolute; bottom: 12px; left: 50%;
             width: 26px; height: 26px; transform: translateX(-50%);
@@ -254,7 +325,6 @@
             box-shadow: 0 5px 10px rgba(0,0,0,0.5);
         }
 
-        /* 撞击棒 */
         .striker {
             position: absolute; top: 50%; left: -120px; width: 120px; height: 44px;
             background: linear-gradient(90deg, #4A3328, #6D4C41 50%, #4A3328);
@@ -296,8 +366,17 @@
 </head>
 <body>
 
+    <audio id="bg-music" src="bgm.mp3" loop preload="auto"></audio>
+    <audio id="bell-sound" src="bell.mp3" preload="auto"></audio>
+
     <div id="app-container">
         
+        <div id="music-control" class="music-control paused" onclick="toggleMusic(event)">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+        </div>
+
         <div id="home-page" class="page">
             
             <img src="./images/cloud.png" class="bg-cloud cloud-1" alt="cloud">
@@ -341,21 +420,26 @@
             <img src="./images/cloud.png" class="bg-cloud cloud-3" alt="cloud">
 
             <div class="chart-header-group">
-                <div id="nav-switch-btn" class="switch-btn" onclick="toggleStockType()">
-                    <span class="switch-arrow">&lt;</span>
-                    <div>
-                        <span class="switch-small">查看</span>
-                        <span id="nav-target-name">深成指</span>
+                <div class="header-controls">
+                    <div id="nav-switch-btn" class="switch-btn" onclick="toggleStockType()">
+                        <span class="switch-arrow">&lt;</span>
+                        <div>
+                            <span class="switch-small">查看</span>
+                            <span id="nav-target-name">深成指</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div id="cycle-title" class="nav-title serif-font">历史回溯...</div>
                 <div id="cycle-subtitle" class="nav-subtitle"></div>
-                <div id="skip-btn" class="skip-text" onclick="skipAnimation()">跳过动画</div>
             </div>
 
             <div class="chart-container">
                 <div id="main-chart" style="width:100%; height:100%;"></div>
+            </div>
+
+            <div id="skip-btn" class="skip-container" onclick="skipAnimation()">
+                <div class="skip-text">跳过动画</div>
             </div>
 
             <div id="bell-area" class="interaction-area">
@@ -408,8 +492,6 @@
 
     <script>
         // --- 1. 配置与数据 ---
-        // 修改点：更新了壁纸列表，包含 w4, w5, w6
-        // 请确保上传文件名为 w4.jpg, w5.jpg, w6.jpg
         const wallpaperList = ['w1.jpg', 'w2.jpg', 'w3.jpg', 'w4.jpg', 'w5.jpg', 'w6.jpg'];
         
         const zodiacIcons = {
@@ -445,8 +527,63 @@
         let animationTimer = null;
         let isFinalState = false; 
         let blinkInterval = null; 
+        let isMusicPlaying = false;
 
-        // --- 逻辑控制 ---
+        window.onload = function() {
+            initMusic();
+        };
+
+        function initMusic() {
+            const bgm = document.getElementById('bg-music');
+            if(!bgm) return;
+            
+            bgm.volume = 0.3;
+
+            const playPromise = bgm.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    updateMusicIcon(true);
+                }).catch(error => {
+                    console.log('Autoplay prevented. Waiting for user interaction.');
+                    const autoPlayHandler = () => {
+                        if(bgm.paused) {
+                            bgm.play().then(() => {
+                                updateMusicIcon(true);
+                            });
+                        }
+                        document.removeEventListener('click', autoPlayHandler);
+                        document.removeEventListener('touchstart', autoPlayHandler);
+                    };
+                    document.addEventListener('click', autoPlayHandler);
+                    document.addEventListener('touchstart', autoPlayHandler);
+                });
+            }
+        }
+
+        function toggleMusic(e) {
+            e.stopPropagation(); 
+            const bgm = document.getElementById('bg-music');
+            if (bgm.paused) {
+                bgm.play();
+                updateMusicIcon(true);
+            } else {
+                bgm.pause();
+                updateMusicIcon(false);
+            }
+        }
+
+        function updateMusicIcon(isPlaying) {
+            const btn = document.getElementById('music-control');
+            isMusicPlaying = isPlaying;
+            if (isPlaying) {
+                btn.classList.add('playing');
+                btn.classList.remove('paused');
+            } else {
+                btn.classList.remove('playing');
+                btn.classList.add('paused');
+            }
+        }
+
         function startApp(type) {
             currentType = type;
             if (blinkInterval) clearInterval(blinkInterval);
@@ -458,7 +595,14 @@
             chartPage.classList.remove('hidden');
             chartPage.style.opacity = 1;
             document.getElementById('bell-area').classList.remove('visible');
-            document.getElementById('skip-btn').style.display = 'block';
+            
+            // 修改点：确保跳过按钮重置为显示
+            document.getElementById('skip-btn').style.display = 'flex';
+
+            const bgm = document.getElementById('bg-music');
+            if (bgm && bgm.paused && !isMusicPlaying) {
+                 bgm.play().then(() => updateMusicIcon(true)).catch(() => {});
+            }
 
             setTimeout(() => {
                 initChart();
@@ -502,7 +646,6 @@
             startFinalTransition();
         }
 
-        // --- 核心：逐年闪烁动画 ---
         function playSequentialAnimation() {
             isFinalState = false;
             const cycles = [
@@ -569,7 +712,8 @@
             const upColor = '#FF7043';
             const downColor = '#26A69A';
             const centerCircleColor = getComputedStyle(document.documentElement).getPropertyValue('--center-circle-color').trim();
-            const outerRadius = isRetracting ? '30%' : '70%';
+            const outerRadius = isRetracting ? '30%' : '63%'; 
+            const innerRadius = '45%';
 
             return {
                 title: {
@@ -593,7 +737,7 @@
                 series: [
                     {
                         type: 'pie',
-                        radius: ['30%', '45%'],
+                        radius: ['30%', '42%'], 
                         center: ['50%', '50%'],
                         label: {
                             position: 'inner',
@@ -615,7 +759,7 @@
                     {
                         name: '涨跌幅',
                         type: 'pie',
-                        radius: ['47%', outerRadius],
+                        radius: [innerRadius, outerRadius],
                         center: ['50%', '50%'],
                         roseType: 'area',
                         itemStyle: { borderRadius: 0, borderColor: '#FFF7E8', borderWidth: 3 },
@@ -641,7 +785,7 @@
                                 val: { fontSize: 12, fontWeight: 'bold', align: 'center' }
                             }
                         },
-                        labelLine: { show: !isRetracting, length: 3, length2: 5 },
+                        labelLine: { show: !isRetracting, length: 2, length2: 3 },
                         data: data.map(d => {
                             let color = d.rawVal >= 0 ? upColor : downColor;
                             if (d.year === 1990 && currentType === 'sz') {
@@ -730,7 +874,6 @@
 
             let html = '';
             
-            // 1. 正常循环历史年份
             items.forEach(item => {
                 const val = currentType === 'sh' ? item.sh : item.sz;
                 let displayVal, colorClass;
@@ -779,14 +922,23 @@
         function showBellAnimation() {
             const overlay = document.getElementById('bell-overlay');
             const striker = document.getElementById('striker');
-            const bigBell = document.getElementById('big-bell'); // 此时 big-bell 是 container
+            const bigBell = document.getElementById('big-bell'); 
+            const bellSound = document.getElementById('bell-sound');
             
             pickRandomWallpaper();
 
             overlay.classList.add('active');
             setTimeout(() => {
                 striker.classList.add('strike');
-                setTimeout(() => bigBell.classList.add('ringing'), 250);
+                
+                setTimeout(() => {
+                    if (bellSound) {
+                        bellSound.currentTime = 0;
+                        bellSound.play().catch(e => console.log('Bell sound error:', e));
+                    }
+                    bigBell.classList.add('ringing');
+                }, 250);
+
                 setTimeout(() => {
                     overlay.classList.remove('active');
                     striker.classList.remove('strike');
@@ -796,16 +948,13 @@
             }, 300);
         }
 
-        // 修改点：直接下载壁纸的逻辑
         function saveCurrentWallpaper() {
             const imgEl = document.getElementById('wallpaper-img');
             if (!imgEl || !imgEl.src) return;
 
             const url = imgEl.src;
-            // 创建一个临时链接触发下载
             const link = document.createElement('a');
             link.href = url;
-            // 设置下载文件名
             link.download = 'Jin10_Wallpaper.jpg';
             document.body.appendChild(link);
             link.click();
